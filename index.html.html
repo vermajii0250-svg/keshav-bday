@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="hi" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Happy Birthday Keshav! 🎉 | Bhai Ka Birthday</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Canvas Confetti Library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  
+  <!-- Google Fonts: Poppins, Fredoka & Pacifico -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Pacifico&family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Poppins', 'sans-serif'],
+            display: ['Fredoka', 'sans-serif'],
+            handwriting: ['Pacifico', 'cursive']
+          },
+          colors: {
+            gold: '#FFD700',
+            neonPink: '#FF1493',
+            neonCyan: '#00FFFF',
+            partyDark: '#0b0f19'
+          },
+          animation: {
+            'float': 'float 4s ease-in-out infinite',
+            'pulse-glow': 'pulseGlow 2s infinite',
+            'flicker': 'flicker 1.5s infinite alternate',
+            'bounce-slow': 'bounce 3s infinite'
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
+              '50%': { transform: 'translateY(-15px) rotate(3deg)' }
+            },
+            pulseGlow: {
+              '0%, 100%': { filter: 'drop-shadow(0 0 15px rgba(255, 215, 0, 0.6))' },
+              '50%': { filter: 'drop-shadow(0 0 35px rgba(255, 20, 147, 0.9))' }
+            },
+            flicker: {
+              '0%': { opacity: '0.8', transform: 'scale(1) rotate(-2deg)' },
+              '100%': { opacity: '1', transform: 'scale(1.18) rotate(2deg)' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0b0f19;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #252d42;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #FF1493;
+    }
+
+    /* Floating balloons setup */
+    .balloon {
+      position: absolute;
+      bottom: -100px;
+      opacity: 0.85;
+      border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+      animation: floatUp 9s linear infinite;
+    }
+    .balloon::after {
+      content: "";
+      position: absolute;
+      bottom: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 2px;
+      height: 14px;
+      background: rgba(255,255,255,0.4);
+    }
+    @keyframes floatUp {
+      0% { transform: translateY(0) rotate(0deg); opacity: 0.9; }
+      100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; }
+    }
+
+    /* Glassmorphic Cards */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    
+    .glass-card:hover {
+      border-color: rgba(255, 215, 0, 0.5);
+      box-shadow: 0 15px 35px -10px rgba(255, 215, 0, 0.25);
+    }
+
+    /* Candle Flame & Smoke */
+    .flame {
+      background: radial-gradient(ellipse at bottom, #ffff00 0%, #ff8000 50%, #ff0000 100%);
+      border-radius: 50% 50% 20% 20%;
+      box-shadow: 0 0 15px #ff8000, 0 0 25px #ffff00;
+    }
+    
+    .smoke {
+      background: radial-gradient(circle, rgba(200,200,200,0.8) 0%, rgba(255,255,255,0) 70%);
+      animation: smokeRise 1.5s ease-out forwards;
+    }
+    @keyframes smokeRise {
+      0% { opacity: 0.8; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-45px) scale(3.5); }
+    }
+  </style>
+</head>
+
+<body class="bg-partyDark text-white font-sans overflow-x-hidden selection:bg-neonPink selection:text-white min-h-screen relative">
+
+  <!-- HTML5 BACKGROUND AUDIO ELEMENT -->
+  <audio id="bg-music" src="audio1.mp3" loop preload="auto"></audio>
+
+  <!-- BACKGROUND FLOATING BALLOONS -->
+  <div id="balloon-container" class="fixed inset-0 pointer-events-none z-0 overflow-hidden"></div>
+
+  <!-- MUSIC TOGGLE FLOATING BUTTON (TOP RIGHT) -->
+  <button id="music-toggle-btn" onclick="toggleAudio()" title="Sound Toggle" class="fixed top-5 right-5 z-40 bg-white/10 hover:bg-white/20 backdrop-blur-md text-gold border border-gold/40 p-3 rounded-full shadow-2xl transition-all transform hover:scale-110 flex items-center justify-center w-12 h-12">
+    <i id="music-icon" class="fas fa-volume-up text-lg"></i>
+  </button>
+
+  <!-- 1. SURPRISE LOCK SCREEN OVERLAY -->
+  <div id="lock-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e] backdrop-blur-2xl transition-opacity duration-700 p-6 text-center">
+    <div class="max-w-md w-full glass-card p-8 md:p-10 rounded-3xl shadow-2xl border border-white/20 flex flex-col items-center relative overflow-hidden">
+      
+      <!-- Decorative Glow Circle -->
+      <div class="absolute -top-12 -right-12 w-32 h-32 bg-neonPink/30 rounded-full blur-2xl pointer-events-none"></div>
+      <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-gold/20 rounded-full blur-2xl pointer-events-none"></div>
+
+      <div class="text-6xl mb-6 animate-bounce">🎁</div>
+      <span class="px-4 py-1.5 rounded-full text-xs font-extrabold tracking-widest bg-gold/20 text-gold border border-gold/40 uppercase mb-4 shadow-sm">
+        🎉 SPECIAL SURPRISE FOR KESHAV 🎉
+      </span>
+      <h1 class="font-display text-3xl md:text-4xl font-extrabold mb-3 text-white">Hey Keshav! 👋</h1>
+      <p class="text-gray-300 text-sm md:text-base mb-8 leading-relaxed">
+        Tere bhai ne tere birthday ke liye ek special website tayyar ki hai. Sound ON rakho aur niche button dabaao! 🔊
+      </p>
+
+      <button id="unlock-btn" onclick="unlockSurprise()" class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-gold via-amber-400 to-neonPink text-gray-950 font-black text-lg shadow-xl hover:shadow-gold/50 transform hover:-translate-y-1 active:translate-y-0 transition-all duration-300 flex items-center justify-center gap-3 group">
+        <span>Tap To Open Birthday Surprise 🎁</span>
+        <i class="fas fa-sparkles group-hover:rotate-45 transition-transform"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT CONTAINER (Hidden until unlocked) -->
+  <div id="main-content" class="opacity-0 transition-opacity duration-1000 min-h-screen pb-20 z-10 relative">
+
+    <!-- 2. HERO SECTION -->
+    <header class="relative pt-16 pb-12 md:pt-24 md:pb-20 text-center px-4 overflow-hidden">
+      <div class="max-w-4xl mx-auto relative z-10">
+        
+        <!-- Neon Tag -->
+        <div class="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-gold/10 border border-gold/40 text-gold text-xs md:text-sm font-bold mb-6 animate-pulse shadow-inner">
+          <i class="fas fa-crown text-xs text-amber-300"></i>
+          <span>OFFICIAL CELEBRATION DAY OF KESHAV</span>
+          <i class="fas fa-crown text-xs text-amber-300"></i>
+        </div>
+
+        <!-- Big Title -->
+        <h1 class="font-display text-5xl sm:text-7xl lg:text-8xl font-black tracking-tight mb-4 text-transparent bg-clip-text bg-gradient-to-r from-gold via-pink-400 to-neonCyan animate-pulse-glow leading-tight">
+          Happy Birthday <br class="hidden sm:block"/>Keshav! 🎂🔥
+        </h1>
+
+        <!-- Subtitle in Hinglish -->
+        <p class="text-2xl md:text-4xl text-gray-100 font-extrabold mt-4 tracking-wide">
+          Bhai nahi, <span class="text-neonPink underline decoration-gold decoration-wavy underline-offset-8">jaan hai tu!</span> ❤️
+        </p>
+
+        <!-- Mini tags -->
+        <div class="flex flex-wrap justify-center gap-3 mt-8">
+          <span class="px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-xs text-gray-200 font-semibold shadow-sm">#BhaiKaBirthday</span>
+          <span class="px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-xs text-gray-200 font-semibold shadow-sm">#FullSwagMode</span>
+          <span class="px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-xs text-gray-200 font-semibold shadow-sm">#YaarAnmulle</span>
+        </div>
+
+        <!-- Scroll down indicator -->
+        <div class="mt-12">
+          <a href="#memories-section" class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white/5 border border-white/20 text-gold hover:bg-white/10 transition-colors animate-bounce">
+            <i class="fas fa-arrow-down text-lg"></i>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- 3. PHOTO GALLERY SECTION (POLAROID CARDS FOR KESHAV'S PHOTOS) -->
+    <section id="memories-section" class="max-w-6xl mx-auto px-4 py-16 scroll-mt-6">
+      <div class="text-center mb-12">
+        <h2 class="font-display text-3xl md:text-5xl font-extrabold text-white mb-3">
+          Keshav's Swag & <span class="text-gold">Memories</span> 📸
+        </h2>
+        <p class="text-gray-300 text-sm md:text-base max-w-xl mx-auto">
+          Asli hero ke sabse blockbuster looks aur yaadein! 😎
+        </p>
+      </div>
+
+      <!-- Photo Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        
+        <!-- Polaroid Card 1: Kurta & Bullet at Night -->
+        <div class="glass-card p-4 rounded-3xl transform hover:-rotate-2 hover:scale-105 transition-all duration-300 group flex flex-col justify-between shadow-2xl">
+          <div class="relative overflow-hidden rounded-2xl bg-gray-900 aspect-[4/5] mb-4 border border-white/10">
+            <span class="absolute top-3 left-3 z-20 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-600/90 text-white backdrop-blur-md shadow-md">
+              NIGHT RIDER 🏍️
+            </span>
+            <img src="photo1.jpg" 
+                 alt="Keshav Desi Swag & Bullet" 
+                 onerror="this.onerror=null; this.src='https://placehold.co/400x500/111827/FFD700?text=photo1.jpg';"
+                 class="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-700">
+          </div>
+          <div class="text-center px-2 pb-2">
+            <h3 class="font-bold text-lg text-gold">Desi Swag & Bullet</h3>
+            <p class="text-xs text-gray-300 mt-1.5 leading-relaxed">
+              "Raat ke andhere me bhi bhai ka aura alag hi chamakta hai! 🔥"
+            </p>
+          </div>
+        </div>
+
+        <!-- Polaroid Card 2: White Blazer & Turtleneck -->
+        <div class="glass-card p-4 rounded-3xl transform hover:rotate-2 hover:scale-105 transition-all duration-300 group flex flex-col justify-between shadow-2xl">
+          <div class="relative overflow-hidden rounded-2xl bg-gray-900 aspect-[4/5] mb-4 border border-white/10">
+            <span class="absolute top-3 left-3 z-20 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/90 text-gray-950 backdrop-blur-md shadow-md">
+              GENTLEMAN MODE 🤵
+            </span>
+            <img src="photo2.jpg" 
+                 alt="Keshav Gentleman Blazer Look" 
+                 onerror="this.onerror=null; this.src='https://placehold.co/400x500/111827/FF1493?text=photo2.jpg';"
+                 class="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-700">
+          </div>
+          <div class="text-center px-2 pb-2">
+            <h3 class="font-bold text-lg text-neonPink">Full Hero Entry</h3>
+            <p class="text-xs text-gray-300 mt-1.5 leading-relaxed">
+              "Itna handsome lag raha hai ki lagta hai aaj party ka bill yahi bharega! 😎"
+            </p>
+          </div>
+        </div>
+
+        <!-- Polaroid Card 3: Pink Shirt & Shades on Brezza SUV -->
+        <div class="glass-card p-4 rounded-3xl transform hover:-rotate-1 hover:scale-105 transition-all duration-300 group flex flex-col justify-between shadow-2xl">
+          <div class="relative overflow-hidden rounded-2xl bg-gray-900 aspect-[4/5] mb-4 border border-white/10">
+            <span class="absolute top-3 left-3 z-20 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-cyan-500/90 text-gray-950 backdrop-blur-md shadow-md">
+              ROADTRIP VIBES 🚘
+            </span>
+            <img src="photo3.jpg" 
+                 alt="Keshav Pink Shirt & SUV" 
+                 onerror="this.onerror=null; this.src='https://placehold.co/400x500/111827/00FFFF?text=photo3.jpg';"
+                 class="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-700">
+          </div>
+          <div class="text-center px-2 pb-2">
+            <h3 class="font-bold text-lg text-neonCyan">Gaadi, Shades aur Attitude</h3>
+            <p class="text-xs text-gray-300 mt-1.5 leading-relaxed">
+              "Chashma lagake aise khada hai jaise poora ilaka bhai ka hi ho! 🕶️✨"
+            </p>
+          </div>
+        </div>
+
+        <!-- Polaroid Card 4: White Shirt on Bullet with Flowers -->
+        <div class="glass-card p-4 rounded-3xl transform hover:rotate-3 hover:scale-105 transition-all duration-300 group flex flex-col justify-between shadow-2xl">
+          <div class="relative overflow-hidden rounded-2xl bg-gray-900 aspect-[4/5] mb-4 border border-white/10">
+            <span class="absolute top-3 left-3 z-20 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/90 text-gray-950 backdrop-blur-md shadow-md">
+              CLASSIC ROYAL 👑
+            </span>
+            <img src="photo4.jpg" 
+                 alt="Keshav Royal Enfield Classic Look" 
+                 onerror="this.onerror=null; this.src='https://placehold.co/400x500/111827/10B981?text=photo4.jpg';"
+                 class="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-700">
+          </div>
+          <div class="text-center px-2 pb-2">
+            <h3 class="font-bold text-lg text-emerald-300">Bullet Raja</h3>
+            <p class="text-xs text-gray-300 mt-1.5 leading-relaxed">
+              "Royal Enfield ho ya dosti, bhai ka style hamesha classic rehta hai! 💯"
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 4. INTERACTIVE VIRTUAL BIRTHDAY CAKE SECTION -->
+    <section class="max-w-3xl mx-auto px-4 py-16 text-center">
+      <div class="glass-card p-8 md:p-12 rounded-3xl relative overflow-hidden border border-gold/30 shadow-2xl">
+        <h2 class="font-display text-3xl md:text-5xl font-extrabold text-white mb-2">
+          Virtual Birthday Cake 🎂
+        </h2>
+        <p class="text-gray-300 text-sm mb-8">Niche button par click karke candles bujhao aur surprise letter unlock karo!</p>
+
+        <!-- Cake Visual Structure -->
+        <div class="relative w-64 h-56 mx-auto mb-8 flex flex-col items-center justify-end">
+          
+          <!-- Candles Container -->
+          <div class="flex justify-center gap-6 mb-1 z-20">
+            <div class="relative flex flex-col items-center">
+              <div id="flame-1" class="flame w-4 h-6 mb-1 transition-all duration-300 animate-flicker"></div>
+              <div id="smoke-1" class="hidden absolute top-0 w-6 h-6 rounded-full"></div>
+              <div class="w-3 h-12 bg-gradient-to-b from-pink-400 to-pink-600 rounded-t shadow"></div>
+            </div>
+            <div class="relative flex flex-col items-center">
+              <div id="flame-2" class="flame w-4 h-6 mb-1 transition-all duration-300 animate-flicker"></div>
+              <div id="smoke-2" class="hidden absolute top-0 w-6 h-6 rounded-full"></div>
+              <div class="w-3 h-14 bg-gradient-to-b from-yellow-300 to-amber-500 rounded-t shadow"></div>
+            </div>
+            <div class="relative flex flex-col items-center">
+              <div id="flame-3" class="flame w-4 h-6 mb-1 transition-all duration-300 animate-flicker"></div>
+              <div id="smoke-3" class="hidden absolute top-0 w-6 h-6 rounded-full"></div>
+              <div class="w-3 h-12 bg-gradient-to-b from-cyan-400 to-blue-600 rounded-t shadow"></div>
+            </div>
+          </div>
+
+          <!-- Cake Layer 1 (Top) -->
+          <div class="w-44 h-16 bg-gradient-to-r from-pink-500 via-rose-400 to-pink-500 rounded-t-3xl border-t-4 border-amber-200 shadow-md relative z-10 flex items-center justify-center">
+            <span class="text-xs tracking-widest text-white font-extrabold uppercase drop-shadow">K E S H A V</span>
+          </div>
+          <!-- Cake Layer 2 (Bottom) -->
+          <div class="w-60 h-20 bg-gradient-to-r from-purple-700 via-indigo-600 to-purple-700 rounded-t-2xl border-t-4 border-pink-300 shadow-xl relative z-0 flex items-center justify-center">
+            <div class="flex gap-2 text-gold text-xs">
+              <i class="fas fa-star"></i>
+              <i class="fas fa-crown"></i>
+              <i class="fas fa-heart"></i>
+              <i class="fas fa-star"></i>
+            </div>
+          </div>
+          <!-- Cake Plate -->
+          <div class="w-72 h-4 bg-gray-300 rounded-full shadow-2xl -mt-1"></div>
+        </div>
+
+        <!-- Blow Candle Button -->
+        <button id="blow-btn" onclick="blowCandles()" class="py-3.5 px-8 rounded-full bg-gradient-to-r from-neonCyan to-blue-600 text-gray-950 font-extrabold text-lg shadow-lg hover:shadow-cyan-500/50 transform hover:scale-105 active:scale-95 transition-all duration-300 inline-flex items-center gap-2">
+          <i class="fas fa-wind text-gray-900"></i>
+          <span>Blow Candles 💨</span>
+        </button>
+
+        <!-- Secret Letter Box (Hidden initially) -->
+        <div id="secret-letter" class="hidden mt-8 p-6 md:p-8 bg-black/50 border border-gold/40 rounded-3xl text-left backdrop-blur-md transform transition-all duration-500 scale-95 opacity-0 shadow-2xl">
+          <div class="flex items-center justify-between mb-4 border-b border-gold/20 pb-3">
+            <h3 class="font-display text-xl md:text-2xl font-bold text-gold flex items-center gap-2">
+              <i class="fas fa-envelope-open-text text-neonPink"></i>
+              <span>Special Note For You, Keshav!</span>
+            </h3>
+            <span class="text-xs text-gray-400 font-mono">Heartfelt Wish ❤️</span>
+          </div>
+          <div class="text-gray-200 leading-relaxed text-sm md:text-base space-y-4">
+            <p class="font-bold text-white text-base">Happy Birthday mere bhai Keshav! 🎉</p>
+            <p>
+              Tu sirf ek dost nahi, meri family hai. Chahe kitni bhi crazy situation ho ya koi bhi mushkil, pata rehta hai ki bhai hamesha sath khada hai. 
+            </p>
+            <p>
+              Hamesha aise hi khush reh, life me tarakki kar, aur apna ye khoobsurat swag hamesha banaye rakh. Love you bhai! ❤️
+            </p>
+            <p class="text-right font-handwriting text-2xl text-gold pt-2">
+              — Tera Bhai For Life 🥂
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. FUNNY INTERACTIVE PRANK SECTION -->
+    <section class="max-w-3xl mx-auto px-4 py-12 text-center">
+      <div class="glass-card p-8 md:p-12 rounded-3xl border border-neonPink/40 relative overflow-hidden shadow-2xl">
+        <span class="px-4 py-1 rounded-full text-xs font-black bg-neonPink/20 text-neonPink border border-neonPink/30 uppercase tracking-widest mb-4 inline-block">
+          Asli Sawal 🍕🍔
+        </span>
+        <h2 class="font-display text-3xl md:text-5xl font-extrabold text-white mb-3">
+          Party Kab De Raha Hai Bhai? 🍻
+        </h2>
+        <p class="text-gray-300 text-sm mb-8">Option select kar aur sach bata!</p>
+
+        <!-- Dynamic Prank Status Message -->
+        <div id="prank-msg" class="h-6 text-sm font-bold text-amber-300 transition-all mb-4"></div>
+
+        <!-- Interactive Buttons Container -->
+        <div class="flex flex-col sm:flex-row justify-center items-center gap-6 min-h-[140px] relative" id="prank-container">
+          
+          <!-- Option 1: Valid Button -->
+          <button onclick="handlePartyYes()" class="w-full sm:w-auto py-4 px-8 rounded-2xl bg-gradient-to-r from-green-500 via-emerald-500 to-teal-600 text-white font-extrabold text-lg shadow-xl hover:shadow-green-500/50 transform hover:scale-105 active:scale-95 transition-all duration-200 z-10 flex items-center justify-center gap-2">
+            <span>Aaj Shaam Ko! 🥳</span>
+          </button>
+
+          <!-- Option 2: Dodging Runaway Button -->
+          <button id="runaway-btn" 
+                  onmouseover="dodgeButton()" 
+                  onclick="dodgeButton()" 
+                  ontouchstart="dodgeButton(event)" 
+                  class="w-full sm:w-auto py-4 px-8 rounded-2xl bg-gradient-to-r from-rose-600 to-red-700 text-white font-extrabold text-lg shadow-xl transition-all duration-200 z-20 flex items-center justify-center gap-2">
+            <span id="runaway-text">Kabhi Nahi 🏃‍♂️</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="text-center py-8 text-gray-400 text-xs font-medium">
+      <p>Made with ❤️ for Bhai Keshav</p>
+    </footer>
+  </div>
+
+  <!-- PARTY CONFIRMATION MODAL -->
+  <div id="party-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md hidden p-4">
+    <div class="glass-card p-8 rounded-3xl max-w-sm w-full text-center border border-gold/50 shadow-2xl transform transition-all scale-95 opacity-0 relative overflow-hidden" id="party-modal-card">
+      <div class="text-6xl mb-4 animate-bounce">🥳🎉</div>
+      <h3 class="font-display text-3xl font-extrabold text-gold mb-2">Deal Pakki!</h3>
+      <p class="text-gray-200 text-sm mb-6 leading-relaxed">
+        Taiyaar rehna bhai, aaj full party hogi! Location aur time WhatsApp par bhej de jaldi! 🍻
+      </p>
+      <button onclick="closePartyModal()" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-gold to-amber-400 text-gray-950 font-black text-base shadow-lg hover:brightness-110 transition-all">
+        Chal Theek Hai! 👍
+      </button>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // --- 1. AUDIO PLAYER CONTROLLER (WITH SAFE FALLBACK FOR PREVIEW) ---
+    let fallbackAudioCtx = null;
+    let isFallbackPlaying = false;
+    let fallbackInterval = null;
+
+    function getAudioElement() {
+      return document.getElementById('bg-music');
+    }
+
+    // Gentle synthesized Happy Birthday melody fallback if audio1.mp3 is not yet uploaded
+    function startFallbackMelody() {
+      if (isFallbackPlaying) return;
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!fallbackAudioCtx) fallbackAudioCtx = new AudioContext();
+        if (fallbackAudioCtx.state === 'suspended') fallbackAudioCtx.resume();
+        isFallbackPlaying = true;
+        document.getElementById('music-icon').className = "fas fa-volume-up text-gold";
+
+        const notes = [261.63, 261.63, 293.66, 261.63, 349.23, 329.63, 261.63, 261.63, 293.66, 261.63, 392.00, 349.23];
+        let step = 0;
+
+        const playNote = () => {
+          if (!isFallbackPlaying || !fallbackAudioCtx) return;
+          const osc = fallbackAudioCtx.createOscillator();
+          const gain = fallbackAudioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(notes[step % notes.length], fallbackAudioCtx.currentTime);
+          gain.gain.setValueAtTime(0.08, fallbackAudioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, fallbackAudioCtx.currentTime + 0.35);
+          osc.connect(gain);
+          gain.connect(fallbackAudioCtx.destination);
+          osc.start();
+          osc.stop(fallbackAudioCtx.currentTime + 0.38);
+          step++;
+        };
+
+        playNote();
+        fallbackInterval = setInterval(playNote, 450);
+      } catch (e) {
+        // Silently ignore if Web Audio is restricted
+      }
+    }
+
+    function stopFallbackMelody() {
+      isFallbackPlaying = false;
+      if (fallbackInterval) {
+        clearInterval(fallbackInterval);
+        fallbackInterval = null;
+      }
+    }
+
+    function playBgm() {
+      const audio = getAudioElement();
+      if (!audio) return;
+
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise.then(() => {
+          document.getElementById('music-icon').className = "fas fa-volume-up text-gold";
+        }).catch(() => {
+          // In sandboxed preview where audio1.mp3 doesn't exist yet, use safe fallback
+          startFallbackMelody();
+        });
+      }
+    }
+
+    function toggleAudio() {
+      const audio = getAudioElement();
+      const musicIcon = document.getElementById('music-icon');
+      if (!audio) return;
+
+      if (isFallbackPlaying) {
+        stopFallbackMelody();
+        musicIcon.className = "fas fa-volume-mute text-gray-400";
+        return;
+      }
+
+      if (audio.paused) {
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+          playPromise.then(() => {
+            musicIcon.className = "fas fa-volume-up text-gold";
+          }).catch(() => {
+            startFallbackMelody();
+          });
+        }
+      } else {
+        audio.pause();
+        musicIcon.className = "fas fa-volume-mute text-gray-400";
+      }
+    }
+
+    // --- 2. FLOATING BALLOONS GENERATOR ---
+    function createBalloons() {
+      const container = document.getElementById('balloon-container');
+      const colors = ['#FF1493', '#FFD700', '#00FFFF', '#9370DB', '#FF4500', '#32CD32'];
+      
+      for (let i = 0; i < 16; i++) {
+        const balloon = document.createElement('div');
+        balloon.className = 'balloon';
+        const size = Math.random() * 30 + 36;
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        
+        balloon.style.width = `${size}px`;
+        balloon.style.height = `${size * 1.25}px`;
+        balloon.style.backgroundColor = color;
+        balloon.style.left = `${Math.random() * 95}%`;
+        balloon.style.animationDelay = `${Math.random() * 8}s`;
+        balloon.style.animationDuration = `${Math.random() * 6 + 7}s`;
+
+        container.appendChild(balloon);
+      }
+    }
+
+    // --- 3. UNLOCK SURPRISE (LOCK SCREEN REVEAL & AUDIO PLAY) ---
+    function unlockSurprise() {
+      const lockScreen = document.getElementById('lock-screen');
+      const mainContent = document.getElementById('main-content');
+
+      lockScreen.classList.add('opacity-0', 'pointer-events-none');
+      
+      setTimeout(() => {
+        lockScreen.style.display = 'none';
+        mainContent.classList.remove('opacity-0');
+      }, 700);
+
+      // Play uploaded BGM audio file in continuous loop
+      playBgm();
+      
+      // Fire celebration confetti
+      fireConfetti();
+    }
+
+    // Canvas Confetti Blast
+    function fireConfetti() {
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 120,
+          spread: 80,
+          origin: { y: 0.6 }
+        });
+
+        setTimeout(() => {
+          confetti({ particleCount: 60, angle: 60, spread: 60, origin: { x: 0 } });
+          confetti({ particleCount: 60, angle: 120, spread: 60, origin: { x: 1 } });
+        }, 300);
+      }
+    }
+
+    // --- 4. CANDLE BLOWING & LETTER REVEAL ---
+    function blowCandles() {
+      for (let i = 1; i <= 3; i++) {
+        const flame = document.getElementById(`flame-${i}`);
+        const smoke = document.getElementById(`smoke-${i}`);
+        
+        if (flame) {
+          flame.classList.add('opacity-0', 'scale-0');
+        }
+        if (smoke) {
+          smoke.classList.remove('hidden');
+          smoke.classList.add('smoke');
+        }
+      }
+
+      fireConfetti();
+
+      const blowBtn = document.getElementById('blow-btn');
+      blowBtn.disabled = true;
+      blowBtn.innerHTML = `<i class="fas fa-heart text-rose-400"></i><span>Candles Blown!</span>`;
+      blowBtn.classList.replace('from-neonCyan', 'from-pink-600');
+      blowBtn.classList.replace('to-blue-600', 'to-rose-600');
+      blowBtn.classList.add('text-white');
+
+      setTimeout(() => {
+        const letter = document.getElementById('secret-letter');
+        letter.classList.remove('hidden');
+        setTimeout(() => {
+          letter.classList.remove('scale-95', 'opacity-0');
+          letter.classList.add('scale-100', 'opacity-100');
+        }, 50);
+      }, 600);
+    }
+
+    // --- 5. PRANK BUTTON LOGIC ("KABHI NAHI" RUNAWAY) ---
+    const funnyTexts = [
+      "Pakad ke dikha! 😂",
+      "Aise kaise nahi dega?",
+      "Kanjoosi Not Allowed! 🚫",
+      "Chup chap Aaj Shaam Ko daba! 😉",
+      "Bhai ho ke naatakk? 😜"
+    ];
+    let dodgeCount = 0;
+
+    function dodgeButton(e) {
+      if (e) e.preventDefault();
+      const btn = document.getElementById('runaway-btn');
+      const container = document.getElementById('prank-container');
+      const prankMsg = document.getElementById('prank-msg');
+      const runawayText = document.getElementById('runaway-text');
+      
+      const containerRect = container.getBoundingClientRect();
+      const btnRect = btn.getBoundingClientRect();
+
+      const maxX = (containerRect.width / 2) - (btnRect.width / 2);
+      const maxY = 120;
+
+      const randomX = (Math.random() - 0.5) * (maxX > 40 ? maxX : 120);
+      const randomY = (Math.random() - 0.5) * maxY;
+
+      btn.style.transform = `translate(${randomX}px, ${randomY}px)`;
+
+      dodgeCount++;
+      runawayText.innerText = funnyTexts[dodgeCount % funnyTexts.length];
+      prankMsg.innerText = "Haha! 'Kabhi Nahi' wala option bhag raha hai! 😂";
+    }
+
+    function handlePartyYes() {
+      fireConfetti();
+      const modal = document.getElementById('party-modal');
+      const modalCard = document.getElementById('party-modal-card');
+      
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        modalCard.classList.remove('scale-95', 'opacity-0');
+        modalCard.classList.add('scale-100', 'opacity-100');
+      }, 50);
+    }
+
+    function closePartyModal() {
+      const modal = document.getElementById('party-modal');
+      const modalCard = document.getElementById('party-modal-card');
+      
+      modalCard.classList.remove('scale-100', 'opacity-100');
+      modalCard.classList.add('scale-95', 'opacity-0');
+      setTimeout(() => {
+        modal.classList.add('hidden');
+      }, 200);
+    }
+
+    // Initialize balloons on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      createBalloons();
+    });
+  </script>
+</body>
+</html>
